@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Record</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+        <style>
+            bordered {
+            border: 2px solid transparent;
+            
+            }
+            .bordered.active {
+                
+            border-color: red;
+            transition: border-color 1s ease;
+            }
+        </style>
+</head>
+<body class="bg-light">
+    <script>
+        function copyToClipboard(inpID) {
+            var copyText = document.getElementById(inpID); // Get the element containing the text
+            navigator.clipboard.writeText(copyText.value) // Copy the text to the clipboard
+                .then(() => {
+                    //alert("Text copied to clipboard!"); // Optional: Provide user feedback                    
+                    copyText.classList.toggle('active');
+                    setTimeout(function() {
+                    copyText.classList.toggle('active');;
+                    }, 1000);
+                })
+                .catch(err => {
+                    console.error('Failed to copy text: ', err);
+                });
+        }
+        function toggleBorder() {
+        
+        }
+    </script>
+<div class="container py-4">
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h5 class="card-title mb-4">Edit Record (ID: {{ rowid }})</h5>
+            <form method="POST">
+
+                <!-- Read-only fields in 2-column label/value format -->
+                <div class="mb-4">
+                    {% for key, value in row.items() %}
+                        {% if key not in editable_fields%}
+                            <div class="row mb-2">
+                                <div class="col-5 col-md-4 text-muted">{{ key }}</div>
+                                <div class="col-7 col-md-8 fw-bold">{{ value }}</div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="mb-4">
+                    <div class="row mb-3">
+                            <div onclick="copyToClipboard('irtext');"  class="col-4 col-md-4 text-muted "><a href="#">Copy Initial Response</a></div>
+                            <div onclick="copyToClipboard('crtext');"  class="col-4 col-md-4 text-muted"><a href="#">Copy Close Response</a></div>
+                            <div onclick="copyToClipboard('mobiletext');"  class="col-4 col-md-4 text-muted"><a href="#">Copy Phone : </a><input type="text" readonly id="mobiletext" class="bordered form-control" value="{{ rowid.split('__')[0] }}"></div>
+                    </div>
+                </div>
+                 <div class="mb-4">
+                    <div class="row mb-2">
+                        <div class="col-6 col-md-6 text-muted"><textarea class="form-control bordered" rows="5" id="irtext">{{ir}}</textarea></div>
+                        <div class="col-6 col-md-6 text-muted"><textarea class="form-control bordered" rows="5" id="crtext">{{cr}}</textarea></div>
+                        
+                      </div>
+                    
+                </div>  
+                <!-- Editable: Contacted -->
+                <div class="mb-3">
+                    <label class="form-label">Contacted</label>
+                    <div class="form-check">
+                    <input type="radio" class="form-check-input" id="ContactedYes" name="Contacted" value="Yes" {% if row.Contacted | lower  == 'yes' %}checked{% endif %}>
+                    <label class="form-check-label" for="ContactedYes">Yes</label>
+                    </div>
+                    <div class="form-check">
+                    <input type="radio" class="form-check-input" id="ContactedNo" name="Contacted" value="" {% if row.Contacted | lower  != 'yes' %}checked{% endif %}>
+                    <label class="form-check-label" for="ContactedNo">No</label>
+                    </div>
+                </div>
+
+                <!-- Editable: Response -->
+                <div class="mb-3">
+                    <label for="Response" class="form-label">Response</label>
+                    <textarea class="form-control" name="Response" id="Response" rows="3">{{ row.Response }}</textarea>
+                </div>
+
+                <!-- Editable: Floor -->
+                <div class="mb-3">
+                    <label for="Floor" class="form-label">Floor</label>{{row.Floor }}
+                    
+                    <input type="text" class="form-control" name="Floor" id="Floor" value="{%if row.Floor != 'nan'%}{{ row.Floor }}{%endif%}">
+                </div>
+
+                <!-- Editable: Status -->
+                <div class="mb-4">
+                    <label for="Status" class="form-label">Status was '{{row.Status}}' </label>
+                    <select class="form-select" name="Status" id="Status">
+                        {% for val, label in status_options.items() %}
+                            <option value="{{ val }}" {% if row.Status == label %}selected{% endif %}>{{ val }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+<div class="mb-4">
+                    <div class="row mb-2">
+                        <div class="col-6 col-md-6"><a href="/" class="btn btn-primary w-100">Cancel</a></div>
+                        <div class="col-6 col-md-6"><button type="submit" class="btn btn-primary w-100">Save Changes</button></div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
