@@ -26,8 +26,9 @@
               <div class="d-flex justify-content-between">
                 <span><small>{{ entry['You can reach me on (Mobile Number)']}}</small></span>
                 {% set rowid = entry['You can reach me on (Mobile Number)'] + "__" + entry['Timestamp'] %}
-                <span><a class="btn btn-success float-right" href="/edit?rowid={{rowid}}">Edit</a></span>
+                <span><a class="btn btn-success float-right" href="/edit?rowid={{rowid}}">Edit</a></span>            
               </div>
+              <div class="text-end"><span><small><i>{{ entry['Response']}}</i></small></span></div>
             </li>
             {% endfor %}
           </ul>

@@ -73,6 +73,90 @@ def update_sheet_data(mobile, dt):
         body={"values": values}
     ).execute()
 
+def update_sheet_from_csv_using_googleapi(    
+    timestamp_value: str,
+    phone_value: str    
+):
+    """
+    Search a row in a CSV by timestamp and phone number,
+    and update Contacted, Response, Floor, Status fields
+    in a Google Sheet using googleapiclient.
+    """
+    # === Read CSV ===
+    df = pd.read_csv(CSV_FILE)
+
+    # === Find matching row ===
+    row_match = df[
+        (df["Timestamp"].astype(str) == str(timestamp_value)) &
+        (df["You can reach me on (Mobile Number)"].astype(str) == str(phone_value))
+    ]
+    if row_match.empty:
+        print("❌ No matching row found in CSV.")
+        return
+    row_data = row_match.iloc[0]
+
+    row_data = row_data.fillna('')
+    service = get_sheet_service()
+
+    # === Get Sheet Data to locate the row ===
+    sheet_range = f"{RANGE_NAME}!A1:Z1000"  # adjust as needed
+    result = service.spreadsheets().values().get(
+        spreadsheetId=SPREADSHEET_ID,
+        range=sheet_range
+    ).execute()
+
+    values = result.get("values", [])
+    if not values:
+        print("❌ Sheet is empty.")
+        return
+
+    headers = values[0]
+
+    # === Locate row by timestamp and phone ===
+    timestamp_idx = headers.index("Timestamp")
+    phone_idx = headers.index("You can reach me on (Mobile Number)")
+
+    target_row_index = None
+    for i, row in enumerate(values[1:], start=2):  # Google Sheets rows are 1-indexed
+        ts = row[timestamp_idx].strip() if timestamp_idx < len(row) else ""
+        ph = row[phone_idx].strip() if phone_idx < len(row) else ""
+        if ts == str(timestamp_value).strip() and ph == str(phone_value).strip():
+            target_row_index = i
+            break
+
+    if target_row_index is None:
+        print("❌ Matching row not found in Google Sheet.")
+        return
+
+    # === Prepare update payload ===
+    update_fields = ['Contacted', 'Response', 'Floor', 'Status']
+    update_values = [str(row_data.get(field, "")) for field in update_fields]
+    update_column_indices = [headers.index(field) for field in update_fields]
+
+    # Convert to A1 notation range like 'D5:G5'
+    start_col = min(update_column_indices)
+    end_col = max(update_column_indices)
+    start_col_letter = chr(ord('A') + start_col)
+    end_col_letter = chr(ord('A') + end_col)
+    update_range = f"{RANGE_NAME}!{start_col_letter}{target_row_index}:{end_col_letter}{target_row_index}"
+
+    # === Execute batch update ===
+    body = {
+        "range": update_range,
+        "majorDimension": "ROWS",
+        "values": [update_values]
+    }
+
+    service.spreadsheets().values().update(
+        spreadsheetId=SPREADSHEET_ID,
+        range=update_range,
+        valueInputOption="USER_ENTERED",
+        body=body
+    ).execute()
+
+    print(f"✅ Row {target_row_index} updated in range {update_range}")
+
+
 @app.route("/fetch", methods=["GET"])
 def fetch():
     df = fetch_sheet_data()
@@ -88,8 +172,8 @@ def index():
             filtered = df[df["Status"].isnull()]
         else:
             filtered = df[df["Status"].str.strip().str.lower() == FILTERTEXT[status].lower()]
-        entries = filtered[["Your Name", "You can reach me on (Mobile Number)", "Timestamp"]].dropna().values.tolist()
-        views[status] = [{"Your Name": n, "You can reach me on (Mobile Number)": m, "Timestamp": o} for n, m, o in entries]
+        entries = filtered[["Your Name", "You can reach me on (Mobile Number)", "Timestamp", "Response"]].dropna().values.tolist()
+        views[status] = [{"Your Name": n, "You can reach me on (Mobile Number)": m, "Timestamp": o, "Response":p} for n, m, o, p in entries]
     return render_template("index.html", views=views, statuses=STATUSES, filters=FILTERTEXT)
 
 @app.route("/save", methods=["POST"])
@@ -122,7 +206,7 @@ def edit():
         for col in SAVE_COLUMNS:
             df.loc[row.index, col] = request.form.get(col)
         save_data(df)
-        update_sheet_data(mobile=mobile, dt=dt)
+        update_sheet_from_csv_using_googleapi(timestamp_value=dt, phone_value=mobile)
         return redirect(url_for("index"))
     
     row_series = row.iloc[0].to_dict()
