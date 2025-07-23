@@ -1,0 +1,48 @@
+services:
+  mypayments:
+    image: python:enq #getting2vinod/addpayment:1.1
+    container_name: enq.myapps.localhost
+    hostname: enq.myapps.localhost
+    networks:
+      - net
+    environment:
+     - APP_ROUTE=enq
+     - AUTH_ROUTE=auth
+     - CONFIG_ENV=auth-stage #change to prod
+    volumes:
+      - ./json:/json
+      - ./config:/app/config
+      - ./templates:/app/templates
+      - ./app.py:/app/app.py
+      - ./authapi.py:/app/authapi.py
+    ports:
+      - 5000:5000
+
+  # bookmyjam:
+  #   image: getting2vinod/bookmyjam:1.0
+  #   container_name: bookmyjam
+  #   hostname: bookmyjamdocker-compose.yaml
+  #   networks:
+  #     - net
+  #   volumes:
+  #     - ../bookmyjam/json:/json
+  #   environment:
+  #    - APP_ROUTE=jam
+  #   entrypoint: "python /app/app.py"
+
+  # pdfviewer:
+  #   image: pdfviewerimage:latest
+  #   container_name: pdfviewer
+  #   hostname: pdfviewer
+  #   networks:
+  #     - net
+  #   environment:
+  #    - APP_ROUTE=pdf
+  #   volumes:
+  #     -  ../pdfviewer:/app
+  #   entrypoint: "python app.py"
+
+networks:
+  net:
+    driver: bridge
+    external: true

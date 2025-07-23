@@ -1,10 +1,23 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request, jsonify, redirect, url_for, current_app
 import pandas as pd
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 import os
+from waitress import serve
+import pytz
+from authapi import check_login, init, auth, username
+
+tz_IN = pytz.timezone('Asia/Kolkata')  
+
+route_prefix = os.getenv('APP_ROUTE') or ""
+
+if(route_prefix != ""):
+    route_prefix = "/" + route_prefix
+
 
 app = Flask(__name__)
+app.secret_key = "thisismyveryloooongsecretkey"
+app.register_blueprint(auth)
 
 SPREADSHEET_ID = '1Yv1gxQdbc5Aq4bo1CMnCAeVMvarltkryPzE4W96DtNw'
 RANGE_NAME = 'Home Enquiry Responses'
@@ -30,6 +43,8 @@ SAVE_COLUMNS = ['Contacted'	,'Response'	,'Floor'	,'Status']
 CSV_FILE = "output.csv"
 
 script_dir = os.path.dirname(__file__)
+
+init(app)
 
 def get_sheet_service():
     creds = service_account.Credentials.from_service_account_file(
@@ -155,6 +170,10 @@ def update_sheet_from_csv_using_googleapi(
     ).execute()
 
     print(f"✅ Row {target_row_index} updated in range {update_range}")
+
+@app.route('/favicon.ico')
+def favicon():
+    return current_app.send_static_file("images/favicon.png")
 
 
 @app.route("/fetch", methods=["GET"])
