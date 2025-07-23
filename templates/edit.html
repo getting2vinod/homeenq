@@ -43,8 +43,7 @@
     <div class="card shadow-sm">
         <div class="card-body">
             <h5 class="card-title mb-4">Edit Record (ID: {{ rowid }})</h5>
-            <form method="POST">
-
+            <form method="POST" action="{{route}}/edit?rowid={{rowid}}">
                 <!-- Read-only fields in 2-column label/value format -->
                 <div class="mb-4">
                     {% for key, value in row.items() %}
@@ -108,7 +107,7 @@
                 </div>
 <div class="mb-4">
                     <div class="row mb-2">
-                        <div class="col-6 col-md-6"><a href="/" class="btn btn-primary w-100">Cancel</a></div>
+                        <div class="col-6 col-md-6"><a href="{{route}}/" class="btn btn-primary w-100">Cancel</a></div>
                         <div class="col-6 col-md-6"><button type="submit" class="btn btn-primary w-100">Save Changes</button></div>
             </form>
         </div>

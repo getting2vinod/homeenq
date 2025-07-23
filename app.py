@@ -14,6 +14,7 @@ route_prefix = os.getenv('APP_ROUTE') or ""
 if(route_prefix != ""):
     route_prefix = "/" + route_prefix
 
+print("Prefix loaded : " + route_prefix)
 
 app = Flask(__name__)
 app.secret_key = "thisismyveryloooongsecretkey"
@@ -22,7 +23,7 @@ app.register_blueprint(auth)
 SPREADSHEET_ID = '1Yv1gxQdbc5Aq4bo1CMnCAeVMvarltkryPzE4W96DtNw'
 RANGE_NAME = 'Home Enquiry Responses'
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-SERVICE_ACCOUNT_FILE = 'service_account.json'
+SERVICE_ACCOUNT_FILE = './json/myutils-437714-bd0d0a3e77bd.json'
 
 STATUSES = [
     'Inbound', 'Contacted', 'Response Received', 'Prospect',
@@ -179,7 +180,7 @@ def favicon():
 @app.route("/fetch", methods=["GET"])
 def fetch():
     df = fetch_sheet_data()
-    return redirect(url_for('index')) 
+    return redirect(route_prefix) #url_for('index') 
 
 
 @app.route("/")
@@ -193,7 +194,7 @@ def index():
             filtered = df[df["Status"].str.strip().str.lower() == FILTERTEXT[status].lower()]
         entries = filtered[["Your Name", "You can reach me on (Mobile Number)", "Timestamp", "Response"]].dropna().values.tolist()
         views[status] = [{"Your Name": n, "You can reach me on (Mobile Number)": m, "Timestamp": o, "Response":p} for n, m, o, p in entries]
-    return render_template("index.html", views=views, statuses=STATUSES, filters=FILTERTEXT)
+    return render_template("index.html", views=views, statuses=STATUSES, filters=FILTERTEXT, route=route_prefix)
 
 @app.route("/save", methods=["POST"])
 def save():
@@ -226,11 +227,12 @@ def edit():
             df.loc[row.index, col] = request.form.get(col)
         save_data(df)
         update_sheet_from_csv_using_googleapi(timestamp_value=dt, phone_value=mobile)
-        return redirect(url_for("index"))
+        return redirect(route_prefix)
     
     row_series = row.iloc[0].to_dict()
-    return render_template("edit.html", row=row_series, rowid=rowid, editable_fields=SAVE_COLUMNS, status_options=FILTERTEXT, ir=initialResponse, cr=closeResponse)
+    return render_template("edit.html", row=row_series, rowid=rowid, editable_fields=SAVE_COLUMNS, status_options=FILTERTEXT, ir=initialResponse, cr=closeResponse, route=route_prefix)
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    #app.run(debug=True)
+    serve(app, host='0.0.0.0', port=7000)

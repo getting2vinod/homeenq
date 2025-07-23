@@ -1,5 +1,5 @@
 services:
-  mypayments:
+  homeenq:
     image: python:enq #getting2vinod/addpayment:1.1
     container_name: enq.myapps.localhost
     hostname: enq.myapps.localhost
@@ -16,7 +16,7 @@ services:
       - ./app.py:/app/app.py
       - ./authapi.py:/app/authapi.py
     ports:
-      - 5000:5000
+      - 7000:7000
 
   # bookmyjam:
   #   image: getting2vinod/bookmyjam:1.0
