@@ -18,7 +18,7 @@ print("Prefix loaded : " + route_prefix)
 
 app = Flask(__name__)
 app.secret_key = "thisismyveryloooongsecretkey"
-app.register_blueprint(auth)
+#app.register_blueprint(auth)
 
 SPREADSHEET_ID = '1Yv1gxQdbc5Aq4bo1CMnCAeVMvarltkryPzE4W96DtNw'
 RANGE_NAME = 'Home Enquiry Responses'
@@ -45,7 +45,7 @@ CSV_FILE = "output.csv"
 
 script_dir = os.path.dirname(__file__)
 
-init(app)
+#init(app)
 
 def get_sheet_service():
     creds = service_account.Credentials.from_service_account_file(
@@ -227,10 +227,10 @@ def edit():
             df.loc[row.index, col] = request.form.get(col)
         save_data(df)
         #save ir and cr if changed
-        if request.form.get("irtext") != initialResponse :
+        if request.form.get("irtext").replace("\r\n", "\n") != initialResponse :
               with open(os.path.join(script_dir, 'intialResponse.txt'), 'w') as f3:
                 f3.write(request.form.get("irtext")) 
-        if request.form.get("crtext") != closeResponse :
+        if request.form.get("crtext").replace("\r\n", "\n") != closeResponse :
               with open(os.path.join(script_dir, 'closeResponse.txt'), 'w') as f4:
                 f4.write(request.form.get("crtext")) 
 
