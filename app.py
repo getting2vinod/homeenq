@@ -189,10 +189,10 @@ def index():
     views = {}
     for status in STATUSES:
         if FILTERTEXT[status] == '':
-            filtered = df[df["Status"].isnull()]
+            filtered = df[df["Status"].isnull() | (df["Status"].str.strip() == '')]
         else:
             filtered = df[df["Status"].str.strip().str.lower() == FILTERTEXT[status].lower()]
-        entries = filtered[["Your Name", "You can reach me on (Mobile Number)", "Timestamp", "Response"]].dropna().values.tolist()
+        entries = filtered[["Your Name", "You can reach me on (Mobile Number)", "Timestamp", "Response"]].dropna(subset=["Your Name", "You can reach me on (Mobile Number)"]).values.tolist()
         views[status] = [{"Your Name": n, "You can reach me on (Mobile Number)": m, "Timestamp": o, "Response":p} for n, m, o, p in entries]
     return render_template("index.html", views=views, statuses=STATUSES, filters=FILTERTEXT, route=route_prefix)
 
@@ -240,7 +240,16 @@ def edit():
     row_series = row.iloc[0].to_dict()
     return render_template("edit.html", row=row_series, rowid=rowid, editable_fields=SAVE_COLUMNS, status_options=FILTERTEXT, ir=initialResponse, cr=closeResponse, route=route_prefix)
 
+@app.route("/cards")
+def card_view():
+    cards = [
+        {"title": "Card 1", "text": "This is the first card."},
+        {"title": "Card 2", "text": "This is the second card."},
+        {"title": "Card 3", "text": "This is the third card."},
+        {"title": "Card 4", "text": "This is the fourth card."},
+    ]
+    return render_template("card.html", cards=cards)
 
 if __name__ == "__main__":
-    #app.run(debug=True)
+    #app.run(debug=True, port=7000)
     serve(app, host='0.0.0.0', port=7000)
