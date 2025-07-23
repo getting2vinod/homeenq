@@ -18,7 +18,7 @@ print("Prefix loaded : " + route_prefix)
 
 app = Flask(__name__)
 app.secret_key = "thisismyveryloooongsecretkey"
-#app.register_blueprint(auth)
+app.register_blueprint(auth)
 
 SPREADSHEET_ID = '1Yv1gxQdbc5Aq4bo1CMnCAeVMvarltkryPzE4W96DtNw'
 RANGE_NAME = 'Home Enquiry Responses'
@@ -45,7 +45,7 @@ CSV_FILE = "output.csv"
 
 script_dir = os.path.dirname(__file__)
 
-#init(app)
+init(app)
 
 def get_sheet_service():
     creds = service_account.Credentials.from_service_account_file(
