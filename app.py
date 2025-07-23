@@ -214,10 +214,10 @@ def edit():
     initialResponse = ""
     closeResponse = ""
 
-    with open(os.path.join(script_dir, 'intialResponse.txt'), 'r') as f:
-            initialResponse = f.read()
-    with open(os.path.join(script_dir, 'closeResponse.txt'), 'r') as f:
-            closeResponse = f.read()
+    with open(os.path.join(script_dir, 'intialResponse.txt'), 'r') as f1:
+            initialResponse = f1.read()
+    with open(os.path.join(script_dir, 'closeResponse.txt'), 'r') as f2:
+            closeResponse = f2.read()
 
     if row is None:
         return "Record not found", 404
@@ -226,6 +226,14 @@ def edit():
         for col in SAVE_COLUMNS:
             df.loc[row.index, col] = request.form.get(col)
         save_data(df)
+        #save ir and cr if changed
+        if request.form.get("irtext") != initialResponse :
+              with open(os.path.join(script_dir, 'intialResponse.txt'), 'w') as f3:
+                f3.write(request.form.get("irtext")) 
+        if request.form.get("crtext") != closeResponse :
+              with open(os.path.join(script_dir, 'closeResponse.txt'), 'w') as f4:
+                f4.write(request.form.get("crtext")) 
+
         update_sheet_from_csv_using_googleapi(timestamp_value=dt, phone_value=mobile)
         return redirect(route_prefix)
     
