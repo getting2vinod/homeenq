@@ -18,7 +18,7 @@ print("Prefix loaded : " + route_prefix)
 
 app = Flask(__name__)
 app.secret_key = "thisismyveryloooongsecretkey"
-app.register_blueprint(auth)
+#app.register_blueprint(auth)
 
 SPREADSHEET_ID = '1Yv1gxQdbc5Aq4bo1CMnCAeVMvarltkryPzE4W96DtNw'
 RANGE_NAME = 'Home Enquiry Responses'
@@ -31,8 +31,8 @@ STATUSES = [
 ]
 
 FILTERTEXT = {
-    'Inbound':'',
-    'Contacted':'Enquiry',
+    'Inbound':'Enquiry',
+    'Contacted':'Contacted',
     'Response Received':'Spotting',
     'Prospect':'Prospect',
     'In Negotiation':'Docking',
@@ -45,7 +45,7 @@ CSV_FILE = "output.csv"
 
 script_dir = os.path.dirname(__file__)
 
-init(app)
+#init(app)
 
 def get_sheet_service():
     creds = service_account.Credentials.from_service_account_file(
@@ -188,8 +188,8 @@ def index():
     df = read_data()
     views = {}
     for status in STATUSES:
-        if FILTERTEXT[status] == '':
-            filtered = df[df["Status"].isnull() | (df["Status"].str.strip() == '')]
+        if status == 'Inbound':
+            filtered = df[df["Status"].isnull() | (df["Status"].str.strip() == '') | (df["Status"].str.strip() == 'Enquiry')]
         else:
             filtered = df[df["Status"].str.strip().str.lower() == FILTERTEXT[status].lower()]
         entries = filtered[["Your Name", "You can reach me on (Mobile Number)", "Timestamp", "Response"]].dropna(subset=["Your Name", "You can reach me on (Mobile Number)"]).values.tolist()
@@ -251,5 +251,5 @@ def card_view():
     return render_template("card.html", cards=cards)
 
 if __name__ == "__main__":
-    #app.run(debug=True, port=7000)
-    serve(app, host='0.0.0.0', port=7000)
+    app.run(debug=True, port=7000)
+    #serve(app, host='0.0.0.0', port=7000)
