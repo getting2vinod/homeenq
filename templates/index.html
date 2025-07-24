@@ -20,16 +20,30 @@
       <div class="col-md-4 mb-4">
         <div class="card shadow">
           <div class="card-header fw-bold text-bg-primary">{{ status }}</div>
+    
           <ul class="list-group list-group-flush status-col" id="{{ status|replace(' ', '_') }}">
             {% for entry in views[status] %}
             <li class="list-group-item" data-number="{{ entry.number }}">
-              <strong>{{ entry['Your Name']}}</strong><br>
-              <div class="d-flex justify-content-between">
-                <span><small>{{ entry['You can reach me on (Mobile Number)']}}</small></span>
-                {% set rowid = entry['You can reach me on (Mobile Number)'] + "__" + entry['Timestamp'] %}
-                <span><a class="btn btn-success float-right" href="{{route}}/edit?rowid={{rowid}}">Edit</a></span>            
-              </div>
-              <div class="text-end"><span><small><i>{{ entry['Response']}}</i></small></span></div>
+                    <div class="row">
+                        <div class="col">
+                          <strong>{{ entry['Your Name']}}</strong><br>
+                          <span><small>{{ entry['You can reach me on (Mobile Number)']}}</small></span><br>
+                          
+                        </div>
+                        
+                        <div class="col-2 float-right">
+                          {% set rowid = entry['You can reach me on (Mobile Number)'] + "__" + entry['Timestamp'] %}
+                                    <span><a class="btn btn-success float-right" href="{{route}}/edit?rowid={{rowid}}">Edit</a></span>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-3"><small><span class="badge rounded-pill text-bg-primary float-left">{{entry['Days_past']}} </span></small></div>
+                        <div class="col-9  d-flex bg-info-subtle border border-info-subtle rounded-3">
+                          <span class="d-flex align-items-end"><small><em>{{ entry['Response']}}</em></small></span>
+                        </div>
+                      </div>             
+              
+              
             </li>
             {% endfor %}
           </ul>

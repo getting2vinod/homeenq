@@ -6,6 +6,7 @@ import os
 from waitress import serve
 import pytz
 from authapi import check_login, init, auth, username
+import datetime
 
 tz_IN = pytz.timezone('Asia/Kolkata')  
 
@@ -192,8 +193,10 @@ def index():
             filtered = df[df["Status"].isnull() | (df["Status"].str.strip() == '') | (df["Status"].str.strip() == 'Enquiry')]
         else:
             filtered = df[df["Status"].str.strip().str.lower() == FILTERTEXT[status].lower()]
-        entries = filtered[["Your Name", "You can reach me on (Mobile Number)", "Timestamp", "Response"]].dropna(subset=["Your Name", "You can reach me on (Mobile Number)"]).values.tolist()
-        views[status] = [{"Your Name": n, "You can reach me on (Mobile Number)": m, "Timestamp": o, "Response":p} for n, m, o, p in entries]
+        filtered['ts'] = pd.to_datetime(df['Timestamp'], format='%d/%m/%Y %H:%M:%S')
+        filtered['Days_past'] = (pd.Timestamp.today().normalize() - filtered['ts']).dt.days
+        entries = filtered[["Your Name", "You can reach me on (Mobile Number)", "Timestamp", "Response", "Days_past"]].dropna(subset=["Your Name", "You can reach me on (Mobile Number)"]).values.tolist()
+        views[status] = [{"Your Name": n, "You can reach me on (Mobile Number)": m, "Timestamp": o, "Response":p, "Days_past":q} for n, m, o, p, q in entries]
     return render_template("index.html", views=views, statuses=STATUSES, filters=FILTERTEXT, route=route_prefix)
 
 @app.route("/save", methods=["POST"])
