@@ -221,7 +221,7 @@ def search():
     jtf = filtered[["Your Name", "You can reach me on (Mobile Number)", "Timestamp", "Response", "Days_past"]].dropna(subset=["Your Name", "You can reach me on (Mobile Number)"])
     #results = [{"Your Name": n, "You can reach me on (Mobile Number)": m, "Timestamp": o, "Response":p, "Days_past":q} for n, m, o, p, q in tf]
 
-    return render_template('partials/search_results.html', results=jtf.to_dict(orient="records"), route=route_prefix)
+    return render_template('partials/search_results.html', results=jtf.to_dict(orient="records"), route=route_prefix, search_term=query)
 
 
 

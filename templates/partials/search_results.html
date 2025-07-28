@@ -1,12 +1,13 @@
 {% if results %}
-   <ul>
+   <ul>{%set search_term = search_term | upper %}
 {% for user in results %}
     <li>
         {% set rowid = user['You can reach me on (Mobile Number)'] + "__" + user['Timestamp'] %}
+
         <div class="row  pb-3">
         <div class="col-12 ">
-         <a class="" href="{{ route }}/edit?rowid={{ rowid }}"><strong>{{ user["Your Name"] }}</strong></a> - {{ user["You can reach me on (Mobile Number)"] }}<br>
-          <span class="badge rounded-pill bg-primary">{{ user['Days_past'] }}d</span><span class="px-2"><small> {{user["Response"]}}</small></span>
+         <a class="" href="{{ route }}/edit?rowid={{ rowid }}"><strong>{{ user["Your Name"] | upper | replace(search_term, '<mark>' + search_term + '</mark>') | safe }}</strong></a> - {{ user["You can reach me on (Mobile Number)"] | upper | replace(search_term, '<mark>' + search_term + '</mark>') | safe  }}<br>
+          <span class="badge rounded-pill bg-primary">{{ user['Days_past'] }}d</span><span class="px-2"><small> {{user["Response"]  | upper | replace(search_term, '<mark>' + search_term + '</mark>') |safe}}</small></span>
         </div>
         
         </div>

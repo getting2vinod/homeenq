@@ -5,34 +5,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Home Enquiry</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   <script src="{{route}}/static/sortable.min.js"></script>
   <style>
     .list-group-item { cursor: grab; }
     .status-col { max-height: 500px; overflow-y: auto; }
+    mark {
+        background-color: yellow; /* Or any desired color */
+        padding: 0px; /* Optional: add some padding */
+    }
   </style>
 </head>
 <body class="bg-light">
 <div class="container py-4">
   <h1 class="text-center mb-4">Home Enquiry Lists</h1>
-  <div class="row">
-    <form id="searchForm" class="row g-2 mb-4">
-    <div class="col-md-10">
-      <input type="text" class="form-control" name="query" placeholder="Search..." required>
+    <form id="searchForm" class="row">
+    <div class="input-group mb-3">
+      <input type="text" class="form-control query" placeholder="Search" aria-label="Search" id="query" name="query" aria-describedby="basic-addon2"  onfocus="this.select();">
+      <div class="input-group-append">
+        <button class="btn btn-outline-primary" type="submit" data-bs-toggle="modal" data-bs-target="#exampleModal" ><i class="fa fa-search"></i></button>
+      </div>
     </div>
-    <div class="col-md-2">
-       <button type="submit" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
-          Search
-        </button>
-    </div>
-    </form>
-  </div>  
+  </form>
+
   <div class="row">
     &nbsp;
   </div>
   <!-- -->
 <form id="statusForm">
-  <div class="row" id="statusAccordion">
-    
+  <div class="row" id="statusAccordion">    
       
         {% for status in statuses %}
         {% set collapse_id = "collapse_" + loop.index|string %}
@@ -122,6 +123,12 @@
         $('#searchResults').html(response);
         
       }
+    });
+  });
+
+    $(document).ready(function() {
+    $('.query').on('click', function() {
+      this.select();
     });
   });
 </script>
