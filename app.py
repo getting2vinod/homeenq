@@ -46,7 +46,7 @@ CSV_FILE = "output.csv"
 
 script_dir = os.path.dirname(__file__)
 
-init(app)
+#init(app)
 
 def get_sheet_service():
     creds = service_account.Credentials.from_service_account_file(
@@ -188,13 +188,15 @@ def fetch():
 def index():    
     df = read_data()
     views = {}
+    df['ts'] = pd.to_datetime(df['Timestamp'], format='%d/%m/%Y %H:%M:%S')
+    df['Days_past'] = (pd.Timestamp.today().normalize() - df['ts']).dt.days
     for status in STATUSES:
         if status == 'Inbound':
             filtered = df[df["Status"].isnull() | (df["Status"].str.strip() == '') | (df["Status"].str.strip() == 'Enquiry')]
         else:
             filtered = df[df["Status"].str.strip().str.lower() == FILTERTEXT[status].lower()]
-        filtered['ts'] = pd.to_datetime(df['Timestamp'], format='%d/%m/%Y %H:%M:%S')
-        filtered['Days_past'] = (pd.Timestamp.today().normalize() - filtered['ts']).dt.days
+        
+        
         entries = filtered[["Your Name", "You can reach me on (Mobile Number)", "Timestamp", "Response", "Days_past"]].dropna(subset=["Your Name", "You can reach me on (Mobile Number)"]).values.tolist()
         views[status] = [{"Your Name": n, "You can reach me on (Mobile Number)": m, "Timestamp": o, "Response":p, "Days_past":q} for n, m, o, p, q in entries]
     return render_template("index.html", views=views, statuses=STATUSES, filters=FILTERTEXT, route=route_prefix)
@@ -204,6 +206,24 @@ def save():
     data = request.json.get("data", [])
     update_sheet_data(data)
     return jsonify({"status": "success"})
+
+
+@app.route('/search', methods=['POST'])
+def search():
+    query = request.form.get('query', '').strip().lower()
+
+    df = pd.read_csv(CSV_FILE)
+    df['ts'] = pd.to_datetime(df['Timestamp'], format='%d/%m/%Y %H:%M:%S')
+    df['Days_past'] = (pd.Timestamp.today().normalize() - df['ts']).dt.days
+    # Filter rows that contain the query (case-insensitive) in any column
+    mask = df.apply(lambda row: row.astype(str).str.lower().str.contains(query).any(), axis=1)
+    filtered = df[mask]
+    jtf = filtered[["Your Name", "You can reach me on (Mobile Number)", "Timestamp", "Response", "Days_past"]].dropna(subset=["Your Name", "You can reach me on (Mobile Number)"])
+    #results = [{"Your Name": n, "You can reach me on (Mobile Number)": m, "Timestamp": o, "Response":p, "Days_past":q} for n, m, o, p, q in tf]
+
+    return render_template('partials/search_results.html', results=jtf.to_dict(orient="records"))
+
+
 
 @app.route("/edit", methods=["GET", "POST"])
 def edit():
