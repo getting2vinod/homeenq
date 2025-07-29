@@ -7,6 +7,7 @@ from waitress import serve
 import pytz
 from authapi import check_login, init, auth, username
 import datetime
+import re
 
 tz_IN = pytz.timezone('Asia/Kolkata')  
 
@@ -260,18 +261,13 @@ def edit():
         update_sheet_from_csv_using_googleapi(timestamp_value=dt, phone_value=mobile)
         return redirect(route_prefix)
     
-    row_series = row.iloc[0].to_dict()
-    return render_template("edit.html", row=row_series, rowid=rowid, editable_fields=SAVE_COLUMNS, status_options=FILTERTEXT, ir=initialResponse, cr=closeResponse, route=route_prefix)
+    #Clean phone number and send it for wa link.
+    mobile = re.sub(r'\D', '', mobile)
+    mobile = mobile[-10:] if len(mobile) > 10 else mobile
 
-@app.route("/cards")
-def card_view():
-    cards = [
-        {"title": "Card 1", "text": "This is the first card."},
-        {"title": "Card 2", "text": "This is the second card."},
-        {"title": "Card 3", "text": "This is the third card."},
-        {"title": "Card 4", "text": "This is the fourth card."},
-    ]
-    return render_template("card.html", cards=cards)
+
+    row_series = row.iloc[0].to_dict()
+    return render_template("edit.html", row=row_series, rowid=rowid,mobile=mobile, editable_fields=SAVE_COLUMNS, status_options=FILTERTEXT, ir=initialResponse, cr=closeResponse, route=route_prefix)
 
 if __name__ == "__main__":
     #app.run(debug=True, port=7000)

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Record</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
         rel="stylesheet">
@@ -39,6 +40,12 @@
         function toggleBorder() {
         
         }
+        function openWA(inpID){
+            const phoneNumber = {{ mobile }}; 
+            // Encode the message to handle spaces and special characters
+            const message = encodeURIComponent(document.getElementById(inpID).value); 
+            window.open(`https://wa.me/${phoneNumber}?text=${message}`);
+        }
     </script>
 <div class="container py-4">
     <div class="card shadow-sm">
@@ -65,8 +72,16 @@
                 </div>
                  <div class="mb-4">
                     <div class="row mb-2"> 
-                        <div class="col-6 col-md-6 text-muted"><textarea class="form-control bordered" rows="5" name="irtext"  id="irtext">{{ir}}</textarea></div>
-                        <div class="col-6 col-md-6 text-muted"><textarea class="form-control bordered" rows="5" name="crtext" id="crtext">{{cr}}</textarea></div>
+                        <div class="col-6 col-md-6 text-muted">
+                            <label class="form-label"><i class="fa fa-whatsapp fa-2x" aria-hidden="true"  onclick="openWA('irtext');"></i></label>
+                            <textarea class="form-control bordered" rows="5" name="irtext"  id="irtext">{{ir}}</textarea>
+                        
+                        </div>
+                        <div class="col-6 col-md-6 text-muted">
+                            <label class="form-label"><i class="fa fa-whatsapp fa-2x" aria-hidden="true" onclick="openWA('crtext');" ></i></label>
+                            <textarea class="form-control bordered" rows="5" name="crtext" id="crtext">{{cr}}</textarea>
+                        
+                        </div>
                         
                       </div>
                     
@@ -99,10 +114,10 @@
 
                 <!-- Editable: Status -->
                 <div class="mb-4">
-                    <label for="Status" class="form-label">Status was '{{row.Status}}' </label>
+                    <label for="Status" class="form-label">Status was '{{row.Status}}' </label>{{status_options.items()}}
                     <select class="form-select" name="Status" id="Status">
                         {% for val, label in status_options.items() %}
-                            <option value="{{ val }}" {% if row.Status == label %}selected{% endif %}>{{ val }}</option>
+                            <option value="{{ label }}" {% if row.Status == label %}selected{% endif %}>{{ val }}</option>
                         {% endfor %}
                     </select>
                 </div>
