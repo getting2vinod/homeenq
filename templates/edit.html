@@ -114,7 +114,7 @@
 
                 <!-- Editable: Status -->
                 <div class="mb-4">
-                    <label for="Status" class="form-label">Status was '{{row.Status}}' </label>{{status_options.items()}}
+                    <label for="Status" class="form-label">Status was '{{row.Status}}' </label>
                     <select class="form-select" name="Status" id="Status">
                         {% for val, label in status_options.items() %}
                             <option value="{{ label }}" {% if row.Status == label %}selected{% endif %}>{{ val }}</option>
