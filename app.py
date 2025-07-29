@@ -264,6 +264,7 @@ def edit():
     #Clean phone number and send it for wa link.
     mobile = re.sub(r'\D', '', mobile)
     mobile = mobile[-10:] if len(mobile) > 10 else mobile
+    mobile = "91" + mobile
 
 
     row_series = row.iloc[0].to_dict()
