@@ -45,9 +45,14 @@ SAVE_COLUMNS = ['Contacted'	,'Response'	,'Floor'	,'Status']
 
 CSV_FILE = "output.csv"
 
+# File paths (relative to app root)
+INITIAL_FILE = 'intialResponse.txt'
+CLOSE_FILE = 'closeResponse.txt'
+
+
 script_dir = os.path.dirname(__file__)
 
-#init(app)
+init(app)
 
 def get_sheet_service():
     creds = service_account.Credentials.from_service_account_file(
@@ -224,7 +229,37 @@ def search():
 
     return render_template('partials/search_results.html', results=jtf.to_dict(orient="records"), route=route_prefix, search_term=query)
 
+@app.route('/editresp', methods=['GET', 'POST'])
+def editor():
+    if request.method == 'POST':
+        initial_text = request.form.get('initial_response', '')
+        close_text = request.form.get('close_response', '')
 
+        # Save contents to files
+        with open(INITIAL_FILE, 'w', encoding='utf-8') as f:
+            f.write(initial_text)
+        with open(CLOSE_FILE, 'w', encoding='utf-8') as f:
+            f.write(close_text)
+
+        print("Files saved successfully.")
+        return redirect(route_prefix + "/edit?rowid=" + request.form.get("rowid")  )
+
+    
+
+    # On GET, load current contents
+    if os.path.exists(INITIAL_FILE):
+        with open(INITIAL_FILE, 'r', encoding='utf-8') as f:
+            initial_text = f.read()
+    else:
+        initial_text = ''
+
+    if os.path.exists(CLOSE_FILE):
+        with open(CLOSE_FILE, 'r', encoding='utf-8') as f:
+            close_text = f.read()
+    else:
+        close_text = ''
+
+    return render_template('editresp.html', initial_text=initial_text, close_text=close_text, rowid=request.args.get("rowid"))
 
 @app.route("/edit", methods=["GET", "POST"])
 def edit():

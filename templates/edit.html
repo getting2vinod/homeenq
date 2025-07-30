@@ -2,7 +2,6 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Record</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
@@ -19,7 +18,12 @@
             border-color: red;
             transition: border-color 1s ease;
             }
+            body {
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: medium;
+            }
         </style>
+        <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <body class="bg-light">
     <script>
@@ -72,14 +76,19 @@
                 </div>
                  <div class="mb-4">
                     <div class="row mb-2"> 
-                        <div class="col-6 col-md-6 text-muted">
+                        <div class="col-4 col-md-4 text-muted">
                             <label class="form-label"><i class="fa fa-whatsapp fa-2x" aria-hidden="true"  onclick="openWA('irtext');"></i></label>
                             <textarea class="form-control bordered" rows="5" name="irtext"  id="irtext">{{ir}}</textarea>
                         
                         </div>
-                        <div class="col-6 col-md-6 text-muted">
+                        <div class="col-4 col-md-4 text-muted">
                             <label class="form-label"><i class="fa fa-whatsapp fa-2x" aria-hidden="true" onclick="openWA('crtext');" ></i></label>
                             <textarea class="form-control bordered" rows="5" name="crtext" id="crtext">{{cr}}</textarea>
+                        
+                        </div>
+                        <div class="col-4 col-md-4 text-muted">
+                            <a class="fa fa-edit fa-2x" aria-hidden="true" href="{{route}}/editresp?rowid={{rowid}}">  </a> 
+                                <label class="form-label"><small>Edit Response Text</small> </label>                 
                         
                         </div>
                         
@@ -121,13 +130,16 @@
                         {% endfor %}
                     </select>
                 </div>
-<div class="mb-4">
+                <div class="mb-4">
                     <div class="row mb-2">
                         <div class="col-6 col-md-6"><a href="{{route}}/" class="btn btn-primary w-100">Cancel</a></div>
                         <div class="col-6 col-md-6"><button type="submit" class="btn btn-primary w-100">Save Changes</button></div>
+                    </div>
+                </div>
             </form>
         </div>
     </div>
 </div>
+
 </body>
 </html>
