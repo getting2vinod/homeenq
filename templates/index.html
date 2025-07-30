@@ -41,11 +41,15 @@
           <div class="accordion accordion-flush" id="accordion_{{ loop.index }}">
             <div class="accordion-item border rounded shadow-sm">
               <h2 class="accordion-header" id="heading_{{ loop.index }}">
-                <button class="accordion-button {% if not loop.first %}collapsed{% endif %}" type="button"
+                <button class="accordion-button {% if not loop.first %}collapsed{% endif %} border" type="button"
                   data-bs-toggle="collapse" data-bs-target="#{{ collapse_id }}"
                   aria-expanded="{{ 'true' if loop.first else 'false' }}"
                   aria-controls="{{ collapse_id }}">
-                  {{ status }}
+            
+                  <span style="width: 100%;">
+  <span style="float: right" class="badge rounded-pill bg-info padding px-4">{{views[status] | length}}</span>
+  <span style="float: left">{{ status }}</span>
+                  </span> 
                 </button>
               </h2>
               <div id="{{ collapse_id }}" class="accordion-collapse collapse {% if loop.first %}show{% endif %}"
@@ -64,7 +68,6 @@
                           <a class="btn btn-sm btn-outline-success" href="{{ route }}/edit?rowid={{ rowid }}">Edit</a>
                         </div>
                       </div>
-
                       <div class="row mb-2">
                         <div class="col-4">
                           <span class="badge rounded-pill bg-primary">{{ entry['Days_past'] }}d</span>
